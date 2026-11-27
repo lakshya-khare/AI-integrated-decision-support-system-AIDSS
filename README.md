@@ -1,223 +1,180 @@
 # AI-Integrated Decision Support System (AIDSS)
-## Maximizing Section Throughput Using AI-Powered Precise Train Traffic Control
+### Section Throughput Optimization & Real-Time Rail Traffic Control
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)](https://fastapi.tiangolo.com)
-[![OR-Tools CP-SAT](https://img.shields.io/badge/OR--Tools-CP--SAT-FF6F00.svg)](https://developers.google.com/optimization)
-[![Tests Passing](https://img.shields.io/badge/tests-9%2F9%20passing-brightgreen.svg)](tests/test_core.py)
-[![Railway Zone](https://img.shields.io/badge/ECoR-Waltair%20Division-003366.svg)](#corridor-digital-twin)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Production%20REST-009688.svg)](https://fastapi.tiangolo.com)
+[![OR-Tools CP-SAT](https://img.shields.io/badge/Google%20OR--Tools-CP--SAT-FF6F00.svg)](https://developers.google.com/optimization)
+[![Tests Passing](https://img.shields.io/badge/Tests-9%2F9%20Passing%20(100%25)-brightgreen.svg)](tests/test_core.py)
+[![Railway Zone](https://img.shields.io/badge/Indian%20Railways-ECoR%20%2F%20Waltair-003366.svg)](#operational-context)
 
-> **Ministry of Railways, Government of India**  
-> **Problem Statement ID**: 25022  
-> **Operational Corridor**: Kottavalasa (KTV) to Palasa (PSA) Mainline, Waltair (WAT) Division, East Coast Railway (ECoR)  
-> **Corridor Length**: 176.83 km | 22 Stations | Double Line Automatic Block Signalling (ABS)
-
----
-
-## 1. Problem Overview & Operational Context
-
-Indian Railways' mainline corridors handle heavy mixed-traffic: high-priority passenger services (Vande Bharat, Rajdhani, Superfast Express operating up to 130 km/h) share tracks with heavy freight rakes (BOXN coal and BCN grain rakes operating at 50–75 km/h). 
-
-When unscheduled delays or track maintenance blocks occur, section controllers must make split-second decisions under high stress. Inefficient holding decisions cause cascading headway congestion across block sections, degrade corridor punctuality, and underutilize line capacity.
-
-**AIDSS** is an industrial-grade, mission-critical Decision Support System engineered for Railway Section Controllers (SCOR) and Chief Controllers (CPCR). It combines **Operations Research (Google OR-Tools CP-SAT)**, **fast disjunctive priority heuristics**, **dynamic loop line allocation ($L \le CSR$)**, **compound What-If disruption simulation**, and **Explainable AI (XAI)** compliant with General & Subsidiary Rules (G&SR Rule 4.23).
+> **Industry Context**: Ministry of Railways (Government of India) | Problem Statement ID: 25022  
+> **Operational Territory**: Kottavalasa (KTV) — Palasa (PSA) Mainline Corridor, Waltair (WAT) Division, East Coast Railway (ECoR)  
+> **Scale**: 176.83 km | 22 Stations | 103 Track Lines | Double-Line Automatic Block Signalling (ABS) | 229 Trains/Day
 
 ---
 
-## 2. Corridor Digital Twin Topology
-
-The system models the physical track topology, station loop dimensions, and traffic of the **KTV–PSA mainline corridor**:
-
-| Parameter | Operational Specification |
-| :--- | :--- |
-| **Span** | 0.00 km (Kottavalasa Jn.) to 176.83 km (Palasa) |
-| **Total Stations** | **22 Stations in physical sequence**: `KTV` $\rightarrow$ `KPL` $\rightarrow$ `ALM` $\rightarrow$ `KUK` $\rightarrow$ `VZM` (Junction) $\rightarrow$ `NML` $\rightarrow$ `GVI` $\rightarrow$ `CPP` $\rightarrow$ `BTVA` $\rightarrow$ `SGDM` $\rightarrow$ `PDU` $\rightarrow$ `DUSI` $\rightarrow$ `CHE` $\rightarrow$ `ULM` $\rightarrow$ `TIU` $\rightarrow$ `HCM` $\rightarrow$ `KBM` $\rightarrow$ `DGB` $\rightarrow$ `NWP` (Junction) $\rightarrow$ `RMZ` $\rightarrow$ `PUN` $\rightarrow$ `PSA` |
-| **Track Infrastructure** | 103 station lines (UP Main, DN Main, Common Loops), each with measured Clear Standing Room (CSR, e.g. 782m at ALM, 750m at SGDM) and turnout speed limits (15 km/h) |
-| **Signalling** | Double Line Automatic Block Signalling (ABS) with 4-aspect colour lights (Green, Double Yellow, Yellow, Red) |
-| **Traffic Handled** | 229 passenger services (Vande Bharat, Mail/Express, Passenger) synchronized with heavy freight traffic |
+![AIDSS Rail Traffic Control Console](docs/screenshots/dashboard.png)
 
 ---
 
-## 3. System Screenshots
+## 1. Project Overview & Interview Elevator Pitch
 
-### Interactive Time-Distance String Chart (Marey Diagram)
-*Real-time train trajectories across 22 stations over 24 hours, directional filters (UP/DN), service filters, spotlight train isolation, and real-time playback marker.*
-![Marey String Chart](docs/screenshots/marey_diagram.png)
+**AIDSS** is an enterprise-grade, mission-critical Decision Support System designed for Railway Section Controllers (SCOR) and Chief Traffic Controllers (CPCR). It automates real-time conflict detection, disjunctive schedule optimization, and dynamic loop line precedence dispatching across high-density mixed-traffic corridors.
 
-### Dynamic Track Schematic & Station Occupancy
-*Linear track schematic showing real-time train positions, station loop dwells, and inter-station block section progression.*
-![Track Schematic](docs/screenshots/track_schematic.png)
+### The Engineering Challenge
+In heavy mixed corridors, high-speed passenger services (130 km/h Vande Bharat, Rajdhani, Superfast Express) share physical tracks with heavy bulk freight (50–75 km/h loaded BOXN coal and BCN grain rakes). When unplanned delays occur (e.g., locomotive snags, caution orders, maintenance blocks), manual controller decisions often cause cascading headway delays across multiple block sections.
 
-### AI Dispatch Recommendations & Explainable AI (XAI)
-*Deep explainability drawer citing Clear Standing Room (CSR) margins, cascading delay prevention, counterfactual risk if overridden, and G&SR Rule 4.23 compliance.*
-![Recommendations](docs/screenshots/recommendations_drawer.png)
-
-### Compound What-If Simulation Sandbox
-*Simulate 2 compound conditions simultaneously (e.g. Train Delay + Track Block), with comparative KPI deltas and train-by-train delta schedule.*
-![Compound What-If Sandbox](docs/screenshots/compound_whatif_sandbox.png)
-
-### Marey Ghost Overlay Preview
-*One-click preview overlaying simulated counterfactual paths (dashed amber ghost curves) against active baseline strings (solid curves) directly on the Marey Chart.*
-![Marey Ghost Overlay](docs/screenshots/whatif_overlay_marey.png)
+### The Solution
+AIDSS solves the **Disjunctive Section Traffic Dispatching Problem (STDP)** using a hybrid optimization approach: **Google OR-Tools CP-SAT** for exact mathematical constraint programming combined with a **sub-25ms fast priority-dispatch heuristic** for live reactive control. It provides Explainable AI (XAI) dispatch advisories, automates schedule mutations upon controller approval, and simulates multi-condition What-If disruptions before field orders are transmitted.
 
 ---
 
-## 4. Key Functional Capabilities
+## 2. Where & How It Is Used
 
-### A. Dynamic Recommendation Lifecycle
-* **Section-Aware Pruning**: As time progresses or as the controller scrubs the Working Time Table (WTT), recommendations for sections the train has already passed are automatically marked `EXPIRED` and pruned from the active queue.
-* **Countdown & Urgency Tiers**: Actionable recommendations within the lookahead window show live countdowns (`⚡ PASSING IN 12m` vs `APPROACHING IN 35m`).
-* **Instant Schedule Mutation upon Approval**:
-  * Diverts the target train to the station's loop line (e.g. `Line 4 Loop`).
-  * Extends dwell time by the hold duration to allow through traffic to overtake.
-  * Clears the mainline with green aspects for the following high-priority train, eliminating headway delay.
-  * Real-time ripple effect: Marey Chart, Track Schematic, live KPIs, and audit trail update immediately.
-
-### B. Compound Multi-Condition What-If Simulation
-* **Simultaneous Disruption Evaluation**: Test two conditions at the same time:
-  * *Condition 1 (Primary)*: Train Delay (mins at station) / Track Block / Temporary Speed Restriction (TSR).
-  * *Condition 2 (Secondary)*: Simultaneous Track Block / TSR Caution Order / Secondary Train Delay.
-* **Controller Presets**:
-  * *Preset 1*: Loco Snag at VZM (+35m) & Track Block on `CPP-BTVA`
-  * *Preset 2*: Talcher Coal BOXN Delay at KPL (+40m) & TSR 30 km/h Caution Order at GVI
-  * *Preset 3*: CHE Passenger Overhaul (+25m) & Single-Line Working on `NWP-RMZ`
-* **Comparative Diff Viewer**:
-  * KPI comparison table (Baseline vs Scenario).
-  * Detailed **Train-by-Train Comparative Schedule Delta** table (train number, service name, baseline arrival, simulated arrival, delay shift, and operational status).
-  * Ghost trajectory overlay on the Marey Chart.
-
-### C. 4-Aspect Colour-Light Signalling & Scott's Line Capacity
-* Simulates 44 automatic colour-light signals (Home, Starter, Advanced Starter for UP & DN) across all 22 stations based on dynamic headway spacing.
-* Calculates **Scott's Line Capacity formula**:
-  $$C = \frac{1440}{T + t} \times E$$
-  * $T$: Section running time on the critical bottleneck block section (`VZM-CPP`, 11.7 km)
-  * $t$: Block clearance & operation time (5.0 min)
-  * $E$: Operating efficiency factor (80% per Railway Operating Manual)
-
-### D. Standby Live TMS Adapter ("Ready for Real Data")
-* Decoupled `BaseDataSource` interface.
-* **Sample Data Mode**: In-memory digital twin caching `Sample Data/` Excel/CSV files.
-* **Live TMS Gateway Mode**: Field-ready REST/WebSocket client ready to connect to Indian Railways' Control Office Application (COA), Train Management System (TMS), and FOIS.
+* **Deployment Target**: Divisional Rail Traffic Control Offices (Control Office Application / TMS Consoles).
+* **Target Users**: Section Controllers (SCOR), Chief Train Controllers (CPCR), and Traffic Planning Officers.
+* **Operational Flow**:
+  1. **Ingestion & Digital Twin**: The system ingests infrastructure geometry (CSR lengths, gradients, speed limits) and train timetables via an abstracted data adapter.
+  2. **Automated Conflict Detection**: The network engine scans running paths to identify headway infractions, platform overlaps, and precedence bottlenecks.
+  3. **AI Dispatch Advisory**: When a faster train approaches a slower train, AIDSS calculates the optimal loop line diversion, verifying physical Clear Standing Room ($L_{\text{train}} \le \text{CSR}_{\text{loop}}$) and delay savings.
+  4. **Controller Action & Schedule Mutation**: When approved by the controller, AIDSS mutates the active timetable in memory, adjusts downstream arrival/departure timings, clears the mainline aspect for the following train, and logs the action to an immutable audit record.
+  5. **Compound Counterfactual Simulation**: Controllers can run multi-condition What-If scenarios (e.g. Loco failure + Block section maintenance) to preview comparative schedule deltas before executing field orders.
 
 ---
 
-## 5. Repository Structure
+## 3. Technology Stack & Architectural Decisions
+
+| Layer | Technologies | Justification & Architecture Rationale |
+| :--- | :--- | :--- |
+| **Backend & API** | **Python 3.10+**, **FastAPI**, **Uvicorn** | Asynchronous, non-blocking REST API with strict Pydantic v2 data validation schemas; sub-millisecond response times for real-time telemetry. |
+| **Optimization Engine** | **Google OR-Tools (CP-SAT)** | Models STDP using interval variables, disjunctive constraints, and priority weights; finds optimal, conflict-free schedules over a 24–48 hour horizon. |
+| **Reactive Solver** | **Custom Priority Dispatch Heuristic** | Fallback algorithm executing in $< 25$ ms. Solves headway conflicts sequentially based on train priority classes (P1 to P6) and inserts dynamic loop holds. |
+| **Analytics Engine** | **Scott’s Capacity Math**, **4-Aspect Signal Simulator** | Implements the authentic Indian Railways Scott's Line Capacity formula ($C = \frac{1440}{T+t} \times E$) and simulates 44 colour-light signals dynamically. |
+| **Frontend UI** | **Vanilla ES6+ JavaScript**, **HTML5 Canvas 2D**, **CSS3** | Built without heavy third-party UI framework bloat. The Marey chart renders hundreds of train trajectories at **60 FPS** on HTML5 Canvas with custom DPR scaling. |
+| **Integration Pattern**| **Adapter Pattern (`BaseDataSource`)** | Decouples data ingestion. Toggles seamlessly between offline digital twin cache (`Sample Data/`) and live railway TMS/COA WebSocket/REST APIs. |
+| **Testing & QA** | **Pytest / Assert-based tests**, **Playwright** | 9 end-to-end algorithmic verification tests + automated headless browser verification ensuring zero JavaScript errors and DOM stability. |
+
+---
+
+## 4. Key Architectural & Algorithmic Highlights
+
+### A. Operations Research Optimization (CP-SAT Model)
+The disjunctive dispatch problem is formulated as:
+$$\min \sum_{t \in \mathcal{T}} \sum_{s \in \mathcal{S}_t} w_t \cdot \max(0, \text{arr}_{t,s} - \text{sched\_arr}_{t,s})$$
+* **Headway Constraints**: Enforces minimum time headway separation between successive trains on the same block section ($h \ge 300\text{ s}$).
+* **Precedence Disjunction**: For train pairs $(t_1, t_2)$ on common track segments, boolean choice variables enforce either $t_1 \prec t_2$ or $t_2 \prec t_1$ based on priority weights ($w_{\text{Vande Bharat}} = 100$, $w_{\text{Superfast}} = 60$, $w_{\text{Freight}} = 20$).
+* **Physical Loop Feasibility**: Recommends loop holds only if train length with safety margin satisfies Clear Standing Room:
+$$\text{Length}_{\text{train}} \times 1.10 \le \text{CSR}_{\text{loop}}$$
+
+### B. Dynamic Recommendation Lifecycle
+* **Automatic Section Expiration**: As trains pass block sections, pending recommendations are automatically marked `EXPIRED` once the train crosses the station approach.
+* **Instant Timetable Mutation**: Approving a recommendation reallocates the train to the loop track (`Line 4`), extends dwell time by the hold duration, shifts downstream stops, and eliminates headway delay for overtaking services.
+* **Live System Reflection**: The live Marey diagram, dynamic track schematic, KPI cards, and signal aspects update instantaneously upon approval.
+
+### C. Multi-Condition Compound What-If Engine
+* Supports testing **two compound disruptions simultaneously** (e.g. *Condition 1: Train Delay at VZM* + *Condition 2: Track Block on CPP-BTVA*).
+* Produces side-by-side KPI comparison and a **Train-by-Train Schedule Delta Table** displaying baseline arrival, scenario arrival, and delay shift per service.
+* Features a **Ghost Trajectory Overlay**: Toggles counterfactual dashed paths over baseline solid strings directly on the Marey Chart.
+
+### D. Explainable AI (XAI)
+Every recommendation includes contextual railway domain reasoning:
+* Technical justification citing exact CSR length in meters.
+* Quantified delay savings on following traffic.
+* Counterfactual risk analysis if overridden by controller.
+* Regulatory compliance: General & Subsidiary Rules (G&SR Rule 4.23 - Precedence of Passenger over Goods), Operating Manual Section 14, and Signal Engineering Manual (SEM).
+
+---
+
+## 5. Data Pipeline & Digital Twin Ingestion
+
+The digital twin models the actual Waltair Division KTV–PSA corridor using official railway operational data:
 
 ```
-AIDSS/
-├── backend/
-│   ├── config.py                 # System configuration, corridor constants, port 8050
-│   ├── domain/
-│   │   └── models.py             # Pydantic models (Station, Line, Train, Conflict, Recommendation)
-│   ├── adapters/
-│   │   ├── base.py               # Abstract BaseDataSource interface
-│   │   ├── sample_data_adapter.py# Offline twin (Excel/CSV parser & fast monotonic cache)
-│   │   └── live_tms_adapter.py   # Standby live TMS/COA client with health checks
-│   ├── engine/
-│   │   ├── network.py            # Corridor graph, CSR feasibility ($L \le CSR$), conflict detection
-│   │   ├── solver.py             # OR-Tools CP-SAT + fast priority-dispatch heuristic (< 25 ms)
-│   │   ├── simulator.py          # Compound What-If simulation engine with train diff calculations
-│   │   ├── explainability.py     # XAI engine (G&SR Rule 4.23, CSR math, cascading risk)
-│   │   ├── audit.py              # Immutable decision audit log
-│   │   └── signalling.py         # Scott's Line Capacity & 4-aspect signal simulator
-│   └── api/
-│       └── main.py               # FastAPI application serving REST endpoints & static frontend
-├── frontend/
-│   ├── index.html                # Railway Controller Command Console
-│   ├── css/style.css             # Dark industrial command center styling
-│   └── js/
-│       ├── app.js                # State orchestrator, scrubber sync & API connector
-│       ├── marey_chart.js        # Vector HTML5 Canvas Marey diagram with ghost overlay
-│       └── track_schematic.js    # Dynamic station loop & block section visualizer
-├── docs/
-│   └── screenshots/              # Console screenshots for documentation
-├── tests/
-│   ├── test_core.py              # 9 automated self-checking verification tests
-│   ├── test_api_approval.py      # E2E test verifying recommendation approval schedule mutation
-│   └── test_browser_e2e.py       # Playwright browser verification suite (0 console errors)
-├── Sample Data/                  # Official Ministry of Railways corridor datasets
-├── requirements.txt              # Production dependencies
-├── run.py                        # Single-command application launcher
-└── README.md                     # Documentation
+Sample Data/
+├── RouteSttnInfo.xlsx                     # Station sequences, chainage (KM), inter-station distances
+├── KTV-PSA-Infra.xlsx                     # Station lines (103 lines), loop CSR lengths, speed limits
+├── KTV_PSA_Passenger_Schedule.xlsx       # Timetables for 229 passenger services (VB, SF, MEX, PASS)
+└── WAT_GOODS_TRAIN_AUG25_...csv           # Operating freight rakes (BCN, BOXN coal/ore trains)
 ```
+
+* **Physical Direction Normalization**: Ingested Southbound (DN) trains are validated against physical arrival progression ($PSA \rightarrow KTV$), resolving schedule direction inversions.
+* **Monotonic Timetable Enforcement**: Deduplicates overlapping operational proposals and strictly enforces non-decreasing dwell-arrival sequences.
+* **Microsecond In-Memory Cache**: Parsed topology is serialized to JSON cache for sub-millisecond cold starts.
 
 ---
 
-## 6. Getting Started
+## 6. Testing Strategy & Verification
+
+The project includes an assert-based self-checking test suite:
+
+```bash
+# 1. Run Core Verification Suite (9 tests covering OR engine, data, and signalling)
+python tests/test_core.py
+
+# 2. Run E2E Decision & Timetable Mutation Test
+python tests/test_api_approval.py
+
+# 3. Run Headless Playwright Browser Test (verifies UI rendering and zero console errors)
+python tests/test_browser_e2e.py
+```
+
+### Verified Test Matrix:
+* **Test 1**: Data Adapter ingestion (22 stations, 176.83 km, 229 trains loaded).
+* **Test 2**: Network Graph & Loop Feasibility check ($L \le CSR$).
+* **Test 3**: RailwayScheduleOptimizer (OR CP-SAT + fast priority dispatch).
+* **Test 4**: Counterfactual What-If simulation engine.
+* **Test 5**: Operational Explainability Engine & G&SR rule generation.
+* **Test 6**: Immutable Audit Manager & Standby Live TMS Adapter health checks.
+* **Test 7**: Scott's Line Capacity calculation ($C = 131\text{ trains/24h}$) & 44 colour-light signals.
+* **Test 8**: Multi-condition compound What-If simulation with train-by-train diff list.
+* **Test 9**: Dynamic recommendation lifecycle & loop line timetable mutation.
+
+---
+
+## 7. Quick Start & Execution
 
 ### Prerequisites
-* Python 3.10 or higher
-* Modern web browser (Chrome, Edge, Firefox)
+* Python 3.10+
+* Google Chrome, Microsoft Edge, or any modern web browser
 
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/<your-username>/AIDSS.git
-   cd AIDSS
-   ```
-
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. (Optional, for headless browser tests):
-   ```bash
-   playwright install chromium
-   ```
-
----
-
-## 7. Running the System
-
-Start the server using the single launcher script:
+### Setup & Run
 ```bash
+# Clone the repository
+git clone https://github.com/<your-username>/AIDSS.git
+cd AIDSS
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the application server
 python run.py
 ```
 
-Once started, access the console:
-* **Controller Web Console**: [http://127.0.0.1:8050](http://127.0.0.1:8050)
-* **Interactive API Documentation (Swagger)**: [http://127.0.0.1:8050/docs](http://127.0.0.1:8050/docs)
+Open your browser:
+* **Railway Controller Console**: [http://127.0.0.1:8050](http://127.0.0.1:8050)
+* **Interactive OpenAPI/Swagger Documentation**: [http://127.0.0.1:8050/docs](http://127.0.0.1:8050/docs)
 
 ---
 
-## 8. Verification & Automated Tests
+## 8. Key API Endpoints
 
-Run the core verification suite:
-```bash
-python tests/test_core.py
-```
-*Executes all 9 automated verification checks (adapter ingestion, network topology, OR-Tools optimization, compound simulation, explainability, TMS health check, Scott's capacity, dynamic recommendation lifecycle, and loop schedule mutation).*
-
-Run the headless browser test:
-```bash
-python tests/test_browser_e2e.py
-```
-*Launches headless Chromium, validates chart rendering, tab switching, What-If simulation execution, and confirms 0 JavaScript errors.*
-
----
-
-## 9. API Reference Summary
-
-| Endpoint | Method | Description |
+| Endpoint | Method | Function |
 | :--- | :---: | :--- |
-| `/api/status` | `GET` | System health, active adapter mode, corridor metadata |
+| `/api/status` | `GET` | System health, adapter state (`sample` / `live_tms`), division metadata |
 | `/api/infrastructure` | `GET` | 22 stations, CSR lengths, speed limits, block sections |
 | `/api/trains/active` | `GET` | Active train schedules across corridor |
 | `/api/trains/positions` | `GET` | Real-time train positions & speeds at given operational second |
 | `/api/recommendations` | `GET` | Dynamic active recommendations (supports `?time_sec=` filtering) |
-| `/api/decisions/action` | `POST` | Approves or overrides recommendations, mutates active schedule |
-| `/api/simulate` | `POST` | Executes compound What-If simulation across 1 or 2+ conditions |
+| `/api/decisions/action` | `POST` | Approves or overrides recommendations; mutates active timetable |
+| `/api/simulate` | `POST` | Executes compound What-If simulation across 1 or 2+ disruptions |
 | `/api/signalling/aspects`| `GET` | Live 4-aspect signal states for UP & DN lines across all stations |
-| `/api/analytics/capacity`| `GET` | Scott's Line Capacity, critical block section, saturation index |
-| `/api/audit` | `GET` | Immutable controller audit records with override justifications |
+| `/api/analytics/capacity`| `GET` | Scott's Line Capacity, critical bottleneck section, saturation index |
+| `/api/audit` | `GET` | Immutable audit trail records with controller override justifications |
 | `/api/datasource/switch` | `POST` | Switches between `sample` digital twin and `live_tms` gateway |
 
 ---
 
-## 10. Compliance & Standards
+## 9. Author & License
 
-* **General & Subsidiary Rules (G&SR)**: Rule 4.23 (Precedence of Passenger traffic over Freight).
-* **Operating Manual**: Section 14 (Clear Standing Room & Maximum Loop Occupancy).
-* **Signal Engineering Manual (SEM)**: Absolute and Automatic Block Signalling clearance criteria.
-* **Digital Logging Standard**: COA/TMS controller audit compatibility with mandatory override reasons.
+Developed for **Problem Statement 25022 (Ministry of Railways, Government of India)**.  
+Built with Python, FastAPI, Google OR-Tools, and HTML5 Canvas.
