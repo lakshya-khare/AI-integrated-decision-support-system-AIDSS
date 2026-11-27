@@ -1,5 +1,18 @@
 [
   {
+    "audit_id": "AUD-0020",
+    "timestamp": "2026-11-28 05:07:08",
+    "controller_id": "TEST-SCOR",
+    "event_type": "TEST_RUN",
+    "recommendation_id": null,
+    "train_number": "12844",
+    "location": "VZM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 0.0,
+    "telemetry_snapshot": {}
+  },
+  {
     "audit_id": "AUD-0019",
     "timestamp": "2026-11-28 04:39:31",
     "controller_id": "TEST-SCOR",
