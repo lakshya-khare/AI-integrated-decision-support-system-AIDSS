@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIDSS - Rail Traffic Control Center | East Coast Railway</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="theme-rail-dark">
+    <!-- Top Command Header -->
+    <header class="control-header">
+        <div class="header-left">
+            <div class="emblem-box">
+                <span class="emblem-icon">🚆</span>
+            </div>
+            <div class="branding">
+                <div class="org-title">INDIAN RAILWAYS &bull; EAST COAST RAILWAY (ECoR)</div>
+                <div class="section-title">
+                    <span class="division-tag">WALTAIR DIVISION</span>
+                    <span class="corridor-name">KOTTAVALASA (KTV) — PALASA (PSA) MAINLINE &bull; 176.8 KM</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-center">
+            <div class="control-badge" id="deskIndicator">
+                <span class="status-dot pulse-green"></span>
+                <span class="badge-text">DESK: SCOR-WAT-01 (ACTIVE)</span>
+            </div>
+            <div class="clock-display" id="clockDisplay">00:00:00 IST</div>
+            <div class="shift-tag" id="shiftTag">SHIFT B &bull; 14:00 - 22:00</div>
+        </div>
+
+        <div class="header-right">
+            <div class="source-toggle-card" id="sourceCard">
+                <div class="source-status">
+                    <span class="source-label">DATA FEED:</span>
+                    <span class="source-value" id="currentSourceBadge">SAMPLE DATA TWIN</span>
+                </div>
+                <button class="btn-source-toggle" id="btnOpenSourceModal" title="Configure Live TMS or Sample Feed">⚙ FEED CONFIG</button>
+            </div>
+            <button class="btn-action-primary" id="btnManualOptimize">
+                <span class="btn-icon">⚡</span> RUN RE-OPTIMIZE
+            </button>
+        </div>
+    </header>
+
+    <!-- Top KPI Performance Bar -->
+    <section class="kpi-banner">
+        <div class="kpi-card">
+            <div class="kpi-title">SECTION THROUGHPUT</div>
+            <div class="kpi-value" id="kpiThroughput">-- <span class="kpi-unit">TRAINS/24H</span></div>
+            <div class="kpi-sub" id="kpiActiveTrains">Active on Section: --</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">PUNCTUALITY INDEX (±5m)</div>
+            <div class="kpi-value value-green" id="kpiPunctuality">--%</div>
+            <div class="kpi-sub">Target: &ge; 92.0%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">AVERAGE SECTION DELAY</div>
+            <div class="kpi-value" id="kpiAvgDelay">-- <span class="kpi-unit">MINS</span></div>
+            <div class="kpi-sub">Priority Weighted</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">SECTION TRACK UTILIZATION</div>
+            <div class="kpi-value" id="kpiUtilization">--%</div>
+            <div class="kpi-sub">Bottleneck: VZM - CPP</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">AI DECISION MITIGATION</div>
+            <div class="kpi-value value-cyan" id="kpiMitigated">-- <span class="kpi-unit">MINS SAVED</span></div>
+            <div class="kpi-sub">Loop Overtakes Active</div>
+        </div>
+    </section>
+
+    <!-- Operational Timeline & Real-Time Playback Scrubber Bar -->
+    <section class="playback-timeline-bar">
+        <div class="playback-controls">
+            <button class="btn-play-pause" id="btnPlayPause" title="Start/Pause Real-Time Playback">
+                <span id="playPauseIcon">▶</span> <span id="playPauseText">PLAY</span>
+            </button>
+            <div class="speed-selector">
+                <span class="speed-label">SPEED:</span>
+                <button class="btn-speed active" data-speed="1">1&times;</button>
+                <button class="btn-speed" data-speed="10">10&times;</button>
+                <button class="btn-speed" data-speed="60">60&times;</button>
+                <button class="btn-speed" data-speed="180">180&times;</button>
+            </div>
+        </div>
+
+        <div class="scrubber-container">
+            <div class="scrubber-header">
+                <span class="scrubber-title">OPERATIONAL TIMELINE (WORKING TIME TABLE DISPATCH SIMULATOR)</span>
+                <div class="scrubber-time-badge" id="scrubberTimeDisplay">06:00:00 IST</div>
+            </div>
+            <input type="range" id="timelineSlider" min="0" max="86400" step="30" value="21600" class="timeline-slider">
+            <div class="scrubber-ticks">
+                <span>00:00</span>
+                <span>03:00</span>
+                <span>06:00</span>
+                <span>09:00</span>
+                <span>12:00</span>
+                <span>15:00</span>
+                <span>18:00</span>
+                <span>21:00</span>
+                <span>24:00</span>
+            </div>
+        </div>
+
+        <div class="shift-jump-group">
+            <span class="jump-label">JUMP:</span>
+            <button class="btn-jump" data-time="21600">06:00 (A)</button>
+            <button class="btn-jump" data-time="50400">14:00 (B)</button>
+            <button class="btn-jump" data-time="79200">22:00 (C)</button>
+        </div>
+    </section>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="console-nav">
+        <button class="nav-tab active" data-tab="tab-marey">📈 TIME-DISTANCE STRING CHART (MAREY)</button>
+        <button class="nav-tab" data-tab="tab-schematic">🛤️ LIVE TRACK SCHEMATIC & SIGNALLING</button>
+        <button class="nav-tab" data-tab="tab-telemetry">🚦 4-ASPECT SIGNALS & LINE CAPACITY</button>
+        <button class="nav-tab" data-tab="tab-recommendations">
+            🎯 AI DISPATCH RECOMMENDATIONS 
+            <span class="badge-count" id="recBadgeCount">0</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-whatif">🔮 WHAT-IF SIMULATION SANDBOX</button>
+        <button class="nav-tab" data-tab="tab-audit">📋 CONTROLLER AUDIT TRAIL</button>
+    </nav>
+
+    <!-- Main Console Work Area -->
+    <main class="console-body">
+
+        <!-- TAB 1: MAREY STRING CHART -->
+        <div class="tab-panel active" id="tab-marey">
+            <div class="panel-toolbar">
+                <div class="toolbar-left">
+                    <span class="toolbar-label">SHIFT:</span>
+                    <button class="btn-pill active" data-window="0-24">FULL DAY (24H)</button>
+                    <button class="btn-pill" data-window="6-14">SHIFT A (06-14)</button>
+                    <button class="btn-pill" data-window="14-22">SHIFT B (14-22)</button>
+                    <button class="btn-pill" data-window="22-30">SHIFT C (22-06)</button>
+                </div>
+
+                <div class="toolbar-filters">
+                    <span class="toolbar-label">DIRECTION:</span>
+                    <button class="btn-pill filter-dir active" data-dir="ALL">ALL</button>
+                    <button class="btn-pill filter-dir" data-dir="UP">⬆ UP (KTV→PSA)</button>
+                    <button class="btn-pill filter-dir" data-dir="DN">⬇ DN (PSA→KTV)</button>
+
+                    <span class="toolbar-label" style="margin-left:8px;">SERVICE:</span>
+                    <button class="btn-pill filter-prio active" data-prio="ALL">ALL</button>
+                    <button class="btn-pill filter-prio" data-prio="PREMIUM">VB / SF</button>
+                    <button class="btn-pill filter-prio" data-prio="EXPRESS">EXP/PASS</button>
+                    <button class="btn-pill filter-prio" data-prio="FREIGHT">FREIGHT</button>
+                </div>
+
+                <div class="toolbar-right">
+                    <div class="search-train-box">
+                        <label for="searchTrainInput">SPOTLIGHT TRAIN:</label>
+                        <select id="searchTrainInput">
+                            <option value="">-- ALL TRAINS (SELECT TO ISOLATE) --</option>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <button class="btn-tool" id="btnZoomIn" title="Zoom In Time Scale">➕</button>
+                    <button class="btn-tool" id="btnZoomOut" title="Zoom Out Time Scale">➖</button>
+                    <button class="btn-tool" id="btnResetChart" title="Reset View">↺ RESET</button>
+                </div>
+            </div>
+
+            <div class="chart-container" id="mareyContainer">
+                <canvas id="mareyCanvas"></canvas>
+                <div class="chart-tooltip" id="chartTooltip"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: LIVE TRACK SCHEMATIC -->
+        <div class="tab-panel" id="tab-schematic">
+            <div class="schematic-header">
+                <div class="schematic-info">
+                    <strong>22 Stations &bull; 44 Main/Loop Lines &bull; Automatic Signalling</strong>
+                    <span class="muted-text">Real-time Block Section Occupancy & Point Allocation</span>
+                </div>
+                <div class="schematic-legend">
+                    <span class="dot-legend dot-green"></span> Green (Clear)
+                    <span class="dot-legend dot-yellow"></span> Double Yellow / Caution
+                    <span class="dot-legend dot-red"></span> Red (Occupied)
+                    <span class="dot-legend dot-loop"></span> Loop Line Hold
+                </div>
+            </div>
+            <div class="schematic-viewport" id="schematicViewport">
+                <!-- Dynamically rendered track schematic -->
+            </div>
+        </div>
+
+        <!-- TAB 3: 4-ASPECT SIGNALLING & LINE CAPACITY (MODULE 5) -->
+        <div class="tab-panel" id="tab-telemetry">
+            <div class="telemetry-grid">
+                <!-- Left: Scott's Line Capacity Analytics -->
+                <div class="capacity-card">
+                    <h3 class="card-heading">📐 LINE CAPACITY ANALYTICS (SCOTT'S FORMULA)</h3>
+                    <p class="card-desc">Indian Railways Standard Operational Section Capacity: <code>C = [1440 / (T + t)] &times; E</code></p>
+                    
+                    <div class="capacity-metrics-grid">
+                        <div class="cap-box">
+                            <span class="cap-label">THEORETICAL CAPACITY</span>
+                            <span class="cap-num" id="capTheoretical">--</span>
+                            <span class="cap-sub">Trains / 24h (Double Line)</span>
+                        </div>
+                        <div class="cap-box">
+                            <span class="cap-label">CHARTERED TRAFFIC</span>
+                            <span class="cap-num" id="capChartered">--</span>
+                            <span class="cap-sub">Active Paths Allocated</span>
+                        </div>
+                        <div class="cap-box">
+                            <span class="cap-label">LINE SATURATION INDEX</span>
+                            <span class="cap-num" id="capSaturation">--%</span>
+                            <span class="cap-sub">Critical Bottleneck: VZM-CPP</span>
+                        </div>
+                        <div class="cap-box">
+                            <span class="cap-label">WHITE-SPACE FREIGHT SLOTS</span>
+                            <span class="cap-num value-cyan" id="capWhiteSpace">--</span>
+                            <span class="cap-sub">Available Dynamic Paths</span>
+                        </div>
+                    </div>
+
+                    <div class="capacity-formula-explanation">
+                        <h4>CRITICAL SECTION BOTTLENECK PROFILE</h4>
+                        <table class="telemetry-table">
+                            <tbody>
+                                <tr>
+                                    <td>Critical Section Bottleneck:</td>
+                                    <td><strong>Vizianagaram (VZM) — Chipurupalle (CPP)</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Section Running Time (T):</td>
+                                    <td><strong>12.5 Minutes</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Block Clearance & Operation Time (t):</td>
+                                    <td><strong>5.0 Minutes</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Operating Efficiency Factor (E):</td>
+                                    <td><strong>0.80 (80% Standard per Operating Manual)</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Congestion Mitigation Strategy:</td>
+                                    <td><span class="status-pill pill-ok">AI Dynamic Loop Precedence Active</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right: 4-Aspect Colour Light Signals along 22 Stations -->
+                <div class="signals-card">
+                    <div class="signals-header">
+                        <div>
+                            <h3 class="card-heading">🚦 LIVE 4-ASPECT AUTOMATIC SIGNALLING TELEMETRY</h3>
+                            <span class="muted-text">Real-time Home, Starter, and Advanced Starter aspects across 22 Stations</span>
+                        </div>
+                        <div class="signal-legend-pills">
+                            <span class="pill-sig sig-green">GREEN (CLEAR)</span>
+                            <span class="pill-sig sig-dyellow">D-YELLOW (ATTENTION)</span>
+                            <span class="pill-sig sig-yellow">YELLOW (CAUTION)</span>
+                            <span class="pill-sig sig-red">RED (DANGER)</span>
+                        </div>
+                    </div>
+
+                    <div class="signals-viewport" id="signalsContainer">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: AI DISPATCH RECOMMENDATIONS & EXPLAINABILITY -->
+        <div class="tab-panel" id="tab-recommendations">
+            <div class="rec-split-view">
+                <!-- Recommendations List -->
+                <div class="rec-list-column">
+                    <div class="column-title">
+                        <span>ACTIVE DISPATCH INTERVENTIONS</span>
+                        <span class="rec-sub" id="recPendingCount">Pending Controller Approval</span>
+                    </div>
+                    <div class="rec-cards-container" id="recCardsContainer">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Deep Explainability & Rule Verification Drawer -->
+                <div class="rec-detail-column" id="recDetailColumn">
+                    <div class="detail-placeholder" id="recPlaceholder">
+                        <div class="placeholder-icon">🎯</div>
+                        <h3>SELECT A RECOMMENDATION</h3>
+                        <p>Click on any pending dispatch recommendation on the left to inspect complete operational rationale, CSR standing room checks, cascading delay risk, and G&SR compliance.</p>
+                    </div>
+
+                    <div class="detail-card hidden" id="recDetailCard">
+                        <div class="detail-header">
+                            <div>
+                                <span class="badge-action" id="detailActionBadge">LOOP HOLD</span>
+                                <span class="detail-id" id="detailRecId">REC-0101</span>
+                            </div>
+                            <div class="detail-savings" id="detailSavings">+14.5 MINS SAVED</div>
+                        </div>
+
+                        <div class="detail-train-info">
+                            <h2 id="detailTrainTitle">BOXN-7041 (COAL-TALCHER-SPL)</h2>
+                            <div class="detail-meta-grid">
+                                <div><span class="meta-label">Location:</span> <span id="detailStation" class="meta-val">Alamanda (ALM)</span></div>
+                                <div><span class="meta-label">Assigned Track:</span> <span id="detailLine" class="meta-val">Line 4 Loop (CSR 782m)</span></div>
+                                <div><span class="meta-label">Holding Window:</span> <span id="detailHoldTime" class="meta-val">12 Mins</span></div>
+                                <div><span class="meta-label">Current Status:</span> <span id="detailStatus" class="meta-val">PENDING</span></div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>OPERATIONAL RATIONALE (EXPLAINABLE AI)</h4>
+                            <p class="rationale-text" id="detailRationaleText">--</p>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>TECHNICAL JUSTIFICATIONS</h4>
+                            <ul class="justification-list" id="detailJustifications">
+                                <!-- Dynamic points -->
+                            </ul>
+                        </div>
+
+                        <div class="detail-section alert-box-risk">
+                            <h4>COUNTERFACTUAL CASING IF OVERRIDDEN</h4>
+                            <p id="detailCounterfactual">--</p>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>REGULATORY & OPERATING MANUAL COMPLIANCE</h4>
+                            <ul class="compliance-list" id="detailCompliance">
+                                <!-- Rules -->
+                            </ul>
+                        </div>
+
+                        <!-- Action Bar for Controller -->
+                        <div class="detail-actions">
+                            <button class="btn-approve" id="btnApproveRec">
+                                <span class="icon">✓</span> APPROVE & TRANSMIT DISPATCH SLIP
+                            </button>
+                            <button class="btn-override" id="btnOverrideRec">
+                                <span class="icon">⚡</span> CONTROLLER OVERRIDE
+                            </button>
+                        </div>
+
+                        <!-- Override Justification Input Box -->
+                        <div class="override-box hidden" id="overrideBox">
+                            <label for="overrideReasonInput">MANDATORY CONTROLLER OVERRIDE JUSTIFICATION:</label>
+                            <textarea id="overrideReasonInput" rows="3" placeholder="Enter reason (e.g., Sr.DOM direct orders / Rake priority / siding urgent placement)..."></textarea>
+                            <div class="override-actions">
+                                <button class="btn-confirm-override" id="btnConfirmOverride">CONFIRM MANUAL OVERRIDE</button>
+                                <button class="btn-cancel-override" id="btnCancelOverride">CANCEL</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: WHAT-IF SIMULATION SANDBOX -->
+        <div class="tab-panel" id="tab-whatif">
+            <div class="whatif-grid">
+                <!-- Left: Multi-Condition Compound Scenario Builder -->
+                <div class="whatif-builder-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 class="card-heading">🔮 COMPOUND WHAT-IF SCENARIO STUDIO</h3>
+                        <span class="status-pill pill-ok" id="compoundBadge">DUAL CONDITION ACTIVE</span>
+                    </div>
+                    <p class="card-desc">Simulate compound operational disruptions (e.g. Loco Delay + Track Maintenance or TSR) simultaneously and inspect difference against baseline.</p>
+
+                    <!-- Presets Selector -->
+                    <div class="preset-bar" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span style="font-size: 11px; color:#64748b; align-self:center; margin-right:4px;">PRESETS:</span>
+                        <button type="button" class="btn-pill" id="preset1Btn" style="font-size:10px; padding:3px 8px;">1: VZM Loco + CPP Block</button>
+                        <button type="button" class="btn-pill" id="preset2Btn" style="font-size:10px; padding:3px 8px;">2: Freight Stall + KPL TSR 30</button>
+                        <button type="button" class="btn-pill" id="preset3Btn" style="font-size:10px; padding:3px 8px;">3: CHE Passenger + NWP-RMZ Single Line</button>
+                    </div>
+
+                    <form id="whatIfForm" class="scenario-form">
+                        <div class="form-group">
+                            <label>SCENARIO NAME</label>
+                            <input type="text" id="simName" value="Loco Snag at VZM & Track Block on CPP-BTVA" required>
+                        </div>
+
+                        <!-- CONDITION 1 BOX -->
+                        <div class="condition-box" style="background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-left: 3px solid #38bdf8; border-radius: 6px; padding: 10px; margin-bottom: 12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:700; color:#38bdf8; margin:0;">
+                                    <input type="checkbox" id="c1Enabled" checked> CONDITION 1: PRIMARY DISRUPTION
+                                </label>
+                                <span class="status-pill pill-info" style="font-size:9px;">EVALUATED</span>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <label style="font-size:10px;">DISRUPTION TYPE</label>
+                                <select id="c1Type">
+                                    <option value="TRAIN_DELAY">Unscheduled Train Delay (Loco / Brake / Passenger)</option>
+                                    <option value="TRACK_BLOCK">Track Block / Maintenance (Single Line Working)</option>
+                                    <option value="SPEED_RESTRICTION">Temporary Speed Restriction (TSR Caution Order)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row" id="c1RowTrainDelay">
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">TARGET TRAIN</label>
+                                    <select id="c1TrainNo">
+                                        <!-- Populated dynamically -->
+                                    </select>
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">DELAY (MINUTES)</label>
+                                    <input type="number" id="c1DelayMins" value="30" min="5" max="180">
+                                </div>
+                            </div>
+
+                            <div class="form-row" id="c1RowStation">
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">OCCURRENCE STATION</label>
+                                    <select id="c1Station">
+                                        <!-- Populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row hidden" id="c1RowBlock">
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">AFFECTED BLOCK SECTION</label>
+                                    <select id="c1BlockId">
+                                        <!-- Populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row hidden" id="c1RowSpeed">
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">RESTRICTED SPEED (KM/H)</label>
+                                    <input type="number" id="c1SpeedKmh" value="30" min="15" max="60">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONDITION 2 BOX -->
+                        <div class="condition-box" style="background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-left: 3px solid #f59e0b; border-radius: 6px; padding: 10px; margin-bottom: 12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:700; color:#f59e0b; margin:0;">
+                                    <input type="checkbox" id="c2Enabled" checked> CONDITION 2: SIMULTANEOUS DISRUPTION
+                                </label>
+                                <span class="status-pill pill-warning" style="font-size:9px;">COMPOUND</span>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <label style="font-size:10px;">DISRUPTION TYPE</label>
+                                <select id="c2Type">
+                                    <option value="TRACK_BLOCK" selected>Track Block / Maintenance (Single Line Working)</option>
+                                    <option value="SPEED_RESTRICTION">Temporary Speed Restriction (TSR Caution Order)</option>
+                                    <option value="TRAIN_DELAY">Secondary Train Delay</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row hidden" id="c2RowTrainDelay">
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">TARGET TRAIN</label>
+                                    <select id="c2TrainNo">
+                                        <!-- Populated dynamically -->
+                                    </select>
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">DELAY (MINUTES)</label>
+                                    <input type="number" id="c2DelayMins" value="20" min="5" max="180">
+                                </div>
+                            </div>
+
+                            <div class="form-row hidden" id="c2RowStation">
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">OCCURRENCE STATION</label>
+                                    <select id="c2Station">
+                                        <!-- Populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row" id="c2RowBlock">
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">AFFECTED BLOCK SECTION</label>
+                                    <select id="c2BlockId">
+                                        <!-- Populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row hidden" id="c2RowSpeed">
+                                <div class="form-group flex-1">
+                                    <label style="font-size:10px;">RESTRICTED SPEED (KM/H)</label>
+                                    <input type="number" id="c2SpeedKmh" value="30" min="15" max="60">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-simulate" id="btnRunSimulation">
+                            ⚡ EXECUTE COMPOUND WHAT-IF SIMULATION
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right: Simulation Results, Diff Viewer & Marey Overlay -->
+                <div class="whatif-results-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 class="card-heading">📊 COUNTERFACTUAL IMPACT & COMPARATIVE DELTA</h3>
+                        <button class="btn-tool hidden" id="btnToggleMareyOverlay" style="background:#0284c7; color:#fff; border-color:#38bdf8; font-size:11px;">
+                            👁️ PREVIEW ON MAREY CHART
+                        </button>
+                    </div>
+                    
+                    <div id="simEmptyNotice" class="sim-empty-state">
+                        <div class="empty-icon">⚖️</div>
+                        <p>Configure compound conditions on the left and execute simulation to view side-by-side KPI comparison and train-by-train delta.</p>
+                    </div>
+
+                    <div id="simResultsContainer" class="hidden">
+                        <div class="impact-summary-box" id="simSummaryText">--</div>
+
+                        <div class="delta-metrics-grid">
+                            <div class="delta-card">
+                                <span class="delta-label">AVG DELAY DELTA</span>
+                                <span class="delta-val" id="deltaDelay">--</span>
+                            </div>
+                            <div class="delta-card">
+                                <span class="delta-label">PUNCTUALITY DELTA</span>
+                                <span class="delta-val" id="deltaPunctuality">--</span>
+                            </div>
+                            <div class="delta-card">
+                                <span class="delta-label">THROUGHPUT DELTA</span>
+                                <span class="delta-val" id="deltaThroughput">--</span>
+                            </div>
+                            <div class="delta-card">
+                                <span class="delta-label">RECS GENERATED</span>
+                                <span class="delta-val" id="deltaRecCount">--</span>
+                            </div>
+                        </div>
+
+                        <div class="comparison-table-wrapper" style="margin-bottom:14px;">
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>KPI METRIC</th>
+                                        <th>BASELINE SCHEDULE</th>
+                                        <th>WHAT-IF SCENARIO</th>
+                                        <th>OPERATIONAL STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Average Delay per Train</td>
+                                        <td id="baseDelay">-- mins</td>
+                                        <td id="simDelay">-- mins</td>
+                                        <td><span class="status-pill pill-warning" id="statusDelay">ABSORBED</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Corridor Punctuality Rate</td>
+                                        <td id="basePunct">--%</td>
+                                        <td id="simPunct">--%</td>
+                                        <td><span class="status-pill pill-ok" id="statusPunct">FEASIBLE</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>24h Section Throughput</td>
+                                        <td id="baseThroughput">-- trains</td>
+                                        <td id="simThroughput">-- trains</td>
+                                        <td><span class="status-pill pill-ok" id="statusThroughput">STABLE</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Track Capacity Utilization</td>
+                                        <td id="baseUtil">--%</td>
+                                        <td id="simUtil">--%</td>
+                                        <td><span class="status-pill pill-info" id="statusUtil">HIGH LOAD</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Train-by-Train Impact Breakdown Diff Table -->
+                        <div class="diff-table-container">
+                            <h4 style="font-size:11px; color:#94a3b8; margin: 10px 0 6px 0; text-transform:uppercase; letter-spacing:0.5px;">
+                                🚆 TRAIN-BY-TRAIN COMPARATIVE SCHEDULE DELTA (BASELINE VS SIMULATION)
+                            </h4>
+                            <div style="max-height: 240px; overflow-y:auto; border: 1px solid #1e293b; border-radius: 6px;">
+                                <table class="comparison-table" style="margin:0;">
+                                    <thead>
+                                        <tr>
+                                            <th>TRAIN NO</th>
+                                            <th>SERVICE NAME</th>
+                                            <th>DIR</th>
+                                            <th>BASELINE ARR</th>
+                                            <th>SCENARIO ARR</th>
+                                            <th>DELAY SHIFT</th>
+                                            <th>STATUS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="simTrainDiffBody">
+                                        <!-- Dynamically populated -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: AUDIT TRAIL -->
+        <div class="tab-panel" id="tab-audit">
+            <div class="audit-toolbar">
+                <div class="audit-heading">
+                    <h3>IMMUTABLE CONTROLLER AUDIT TRAIL</h3>
+                    <span class="muted-text">Complies with Indian Railways Digital Logging Standard (COA / TMS)</span>
+                </div>
+                <button class="btn-tool" id="btnRefreshAudit">↺ REFRESH AUDIT LOG</button>
+            </div>
+
+            <div class="audit-table-wrapper">
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>AUDIT ID</th>
+                            <th>TIMESTAMP (IST)</th>
+                            <th>CONTROLLER ID</th>
+                            <th>EVENT TYPE</th>
+                            <th>TRAIN NO</th>
+                            <th>STATION</th>
+                            <th>ACTION</th>
+                            <th>OVERRIDE JUSTIFICATION / REMARKS</th>
+                            <th>DELAY IMPACT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Data Source Configuration -->
+    <div class="modal-overlay hidden" id="sourceModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>⚙ DATA SOURCE & RAILWAY TMS CONNECTOR</h3>
+                <button class="btn-close-modal" id="btnCloseSourceModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-note">
+                    The AIDSS supports dual-mode operation: running from the packaged Waltair Division digital twin dataset (offline mode) or connecting directly to field signalling & TMS APIs via REST/WebSocket.
+                </p>
+
+                <div class="mode-select-group">
+                    <label class="mode-radio">
+                        <input type="radio" name="sourceMode" value="sample" checked>
+                        <div class="radio-content">
+                            <strong>SAMPLE DATA DIGITAL TWIN (OFFLINE)</strong>
+                            <span>KTV-PSA Corridor Dataset (RouteSttnInfo, KTV-PSA-Infra, Timetable & WAT Goods CSV)</span>
+                        </div>
+                    </label>
+
+                    <label class="mode-radio">
+                        <input type="radio" name="sourceMode" value="live_tms">
+                        <div class="radio-content">
+                            <strong>LIVE TMS / COA API INTEGRATION (REAL-TIME)</strong>
+                            <span>Direct connection to Indian Railways Train Management System Gateway</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="tms-config-fields" id="tmsFields">
+                    <div class="form-group">
+                        <label>TMS REST GATEWAY ENDPOINT</label>
+                        <input type="text" id="tmsUrlInput" value="https://tms.railnet.gov.in/api/v1/wat/ktv-psa">
+                    </div>
+                    <div class="form-group">
+                        <label>SECURE API TOKEN (BEARER / CRIS)</label>
+                        <input type="password" id="tmsKeyInput" placeholder="Enter CRIS / TMS authorization token...">
+                    </div>
+                </div>
+
+                <div class="conn-test-box" id="connTestResult">
+                    <span class="status-indicator ready">READY</span>
+                    <span>Adapter verified and ready for live synchronization.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-save-mode" id="btnSaveSourceConfig">APPLY CONFIGURATION</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/marey_chart.js"></script>
+    <script src="/static/js/track_schematic.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

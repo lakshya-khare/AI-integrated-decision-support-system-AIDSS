@@ -1,0 +1,278 @@
+[
+  {
+    "audit_id": "AUD-0018",
+    "timestamp": "2026-11-28 04:24:59",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0673",
+    "train_number": "17016",
+    "location": "DGB",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 7.8,
+    "telemetry_snapshot": {
+      "train_name": "SC-BBSN VISAKHA",
+      "station": "DGB"
+    }
+  },
+  {
+    "audit_id": "AUD-0017",
+    "timestamp": "2026-11-28 04:24:52",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0672",
+    "train_number": "17016",
+    "location": "TIU",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 5.2,
+    "telemetry_snapshot": {
+      "train_name": "SC-BBSN VISAKHA",
+      "station": "TIU"
+    }
+  },
+  {
+    "audit_id": "AUD-0016",
+    "timestamp": "2026-11-28 04:24:46",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0672",
+    "train_number": "17016",
+    "location": "TIU",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 5.2,
+    "telemetry_snapshot": {
+      "train_name": "SC-BBSN VISAKHA",
+      "station": "TIU"
+    }
+  },
+  {
+    "audit_id": "AUD-0015",
+    "timestamp": "2026-11-28 04:24:39",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0671",
+    "train_number": "17016",
+    "location": "ULM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 5.2,
+    "telemetry_snapshot": {
+      "train_name": "SC-BBSN VISAKHA",
+      "station": "ULM"
+    }
+  },
+  {
+    "audit_id": "AUD-0014",
+    "timestamp": "2026-11-28 04:24:33",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0671",
+    "train_number": "17016",
+    "location": "ULM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 5.2,
+    "telemetry_snapshot": {
+      "train_name": "SC-BBSN VISAKHA",
+      "station": "ULM"
+    }
+  },
+  {
+    "audit_id": "AUD-0013",
+    "timestamp": "2026-11-28 04:23:28",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0355",
+    "train_number": "58531",
+    "location": "GVI",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 11.7,
+    "telemetry_snapshot": {
+      "train_name": "PSA-VSKP PASSENGER",
+      "station": "GVI"
+    }
+  },
+  {
+    "audit_id": "AUD-0012",
+    "timestamp": "2026-11-28 04:23:18",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0217",
+    "train_number": "15630",
+    "location": "KTV",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 6.5,
+    "telemetry_snapshot": {
+      "train_name": "NAGAON EXPRESS",
+      "station": "KTV"
+    }
+  },
+  {
+    "audit_id": "AUD-0011",
+    "timestamp": "2026-11-28 04:23:06",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0216",
+    "train_number": "15630",
+    "location": "KTV",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 6.5,
+    "telemetry_snapshot": {
+      "train_name": "NAGAON EXPRESS",
+      "station": "KTV"
+    }
+  },
+  {
+    "audit_id": "AUD-0010",
+    "timestamp": "2026-11-28 04:22:57",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0215",
+    "train_number": "15630",
+    "location": "KTV",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 6.5,
+    "telemetry_snapshot": {
+      "train_name": "NAGAON EXPRESS",
+      "station": "KTV"
+    }
+  },
+  {
+    "audit_id": "AUD-0009",
+    "timestamp": "2026-11-28 04:12:10",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0130",
+    "train_number": "7029",
+    "location": "ALM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 5.2,
+    "telemetry_snapshot": {
+      "train_name": "AGTL-CHZ",
+      "station": "ALM"
+    }
+  },
+  {
+    "audit_id": "AUD-0008",
+    "timestamp": "2026-11-28 04:07:26",
+    "controller_id": "TEST-SCOR",
+    "event_type": "TEST_RUN",
+    "recommendation_id": null,
+    "train_number": "12844",
+    "location": "VZM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 0.0,
+    "telemetry_snapshot": {}
+  },
+  {
+    "audit_id": "AUD-0007",
+    "timestamp": "2026-11-28 04:06:53",
+    "controller_id": "TEST-SCOR",
+    "event_type": "TEST_RUN",
+    "recommendation_id": null,
+    "train_number": "12844",
+    "location": "VZM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 0.0,
+    "telemetry_snapshot": {}
+  },
+  {
+    "audit_id": "AUD-0006",
+    "timestamp": "2026-11-28 03:57:48",
+    "controller_id": "TEST-SCOR",
+    "event_type": "TEST_RUN",
+    "recommendation_id": null,
+    "train_number": "12844",
+    "location": "VZM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 0.0,
+    "telemetry_snapshot": {}
+  },
+  {
+    "audit_id": "AUD-0005",
+    "timestamp": "2026-11-28 03:54:13",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0117",
+    "train_number": "6903",
+    "location": "ULM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 10.4,
+    "telemetry_snapshot": {
+      "train_name": "CAN-KOAA BGT SPL",
+      "station": "ULM"
+    }
+  },
+  {
+    "audit_id": "AUD-0004",
+    "timestamp": "2026-11-28 03:53:58",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0102",
+    "train_number": "18447",
+    "location": "BTVA",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 9.1,
+    "telemetry_snapshot": {
+      "train_name": "BHUBANESWAR JAGDALPUR SPE",
+      "station": "BTVA"
+    }
+  },
+  {
+    "audit_id": "AUD-0003",
+    "timestamp": "2026-11-28 03:53:45",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0102",
+    "train_number": "18447",
+    "location": "BTVA",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 9.1,
+    "telemetry_snapshot": {
+      "train_name": "BHUBANESWAR JAGDALPUR SPE",
+      "station": "BTVA"
+    }
+  },
+  {
+    "audit_id": "AUD-0002",
+    "timestamp": "2026-11-28 03:53:40",
+    "controller_id": "WAT-SCOR-01",
+    "event_type": "DECISION_APPROVED",
+    "recommendation_id": "REC-0101",
+    "train_number": "18447",
+    "location": "SGDM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 11.7,
+    "telemetry_snapshot": {
+      "train_name": "BHUBANESWAR JAGDALPUR SPE",
+      "station": "SGDM"
+    }
+  },
+  {
+    "audit_id": "AUD-0001",
+    "timestamp": "2026-11-28 03:50:30",
+    "controller_id": "TEST-SCOR",
+    "event_type": "TEST_RUN",
+    "recommendation_id": null,
+    "train_number": "12844",
+    "location": "VZM",
+    "action_taken": "LOOP_HOLD",
+    "override_reason": null,
+    "projected_delay_delta_mins": 0.0,
+    "telemetry_snapshot": {}
+  }
+]
